@@ -10,6 +10,13 @@
 		76399C431C112C7500B4B402 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76399C421C112C7500B4B402 /* AppDelegate.swift */; };
 		76399C451C112C7500B4B402 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 76399C441C112C7500B4B402 /* Assets.xcassets */; };
 		76399C481C112C7500B4B402 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 76399C461C112C7500B4B402 /* MainMenu.xib */; };
+		76399C501C112CF600B4B402 /* Macros.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76399C4F1C112CF600B4B402 /* Macros.swift */; };
+		76E0CFAC1C11C7EC00283BBA /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76E0CFAB1C11C7EC00283BBA /* ScriptingBridge.framework */; };
+		76E0CFAE1C11C7F300283BBA /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76E0CFAD1C11C7F300283BBA /* AVFoundation.framework */; };
+		76E0CFB01C11C80000283BBA /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76E0CFAF1C11C80000283BBA /* QuartzCore.framework */; };
+		76E0CFB81C11CF7100283BBA /* iTunesBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 76E0CFB71C11CF7100283BBA /* iTunesBridge.m */; };
+		76E0CFC01C12DD2400283BBA /* LyricsLineModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E0CFBF1C12DD2400283BBA /* LyricsLineModel.swift */; };
+		76E0CFC21C130E5200283BBA /* LyricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E0CFC11C130E5200283BBA /* LyricsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -18,6 +25,16 @@
 		76399C441C112C7500B4B402 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		76399C471C112C7500B4B402 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		76399C491C112C7500B4B402 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		76399C4F1C112CF600B4B402 /* Macros.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Macros.swift; sourceTree = "<group>"; };
+		76E0CFAB1C11C7EC00283BBA /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = System/Library/Frameworks/ScriptingBridge.framework; sourceTree = SDKROOT; };
+		76E0CFAD1C11C7F300283BBA /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		76E0CFAF1C11C80000283BBA /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		76E0CFB41C11CF7000283BBA /* LrcMaker-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LrcMaker-Bridging-Header.h"; sourceTree = "<group>"; };
+		76E0CFB51C11CF7100283BBA /* iTunes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunes.h; sourceTree = "<group>"; };
+		76E0CFB61C11CF7100283BBA /* iTunesBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunesBridge.h; sourceTree = "<group>"; };
+		76E0CFB71C11CF7100283BBA /* iTunesBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iTunesBridge.m; sourceTree = "<group>"; };
+		76E0CFBF1C12DD2400283BBA /* LyricsLineModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LyricsLineModel.swift; sourceTree = "<group>"; };
+		76E0CFC11C130E5200283BBA /* LyricsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LyricsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -25,6 +42,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				76E0CFB01C11C80000283BBA /* QuartzCore.framework in Frameworks */,
+				76E0CFAE1C11C7F300283BBA /* AVFoundation.framework in Frameworks */,
+				76E0CFAC1C11C7EC00283BBA /* ScriptingBridge.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -51,11 +71,45 @@
 			isa = PBXGroup;
 			children = (
 				76399C421C112C7500B4B402 /* AppDelegate.swift */,
-				76399C441C112C7500B4B402 /* Assets.xcassets */,
+				76E0CFBF1C12DD2400283BBA /* LyricsLineModel.swift */,
+				76E0CFC11C130E5200283BBA /* LyricsView.swift */,
+				76E0CFB61C11CF7100283BBA /* iTunesBridge.h */,
+				76E0CFB71C11CF7100283BBA /* iTunesBridge.m */,
 				76399C461C112C7500B4B402 /* MainMenu.xib */,
-				76399C491C112C7500B4B402 /* Info.plist */,
+				76E0CFB91C11CF8E00283BBA /* Header */,
+				76E0CFBA1C11CFB800283BBA /* Other */,
+				76E0CFB11C11C80D00283BBA /* FrameWorks */,
 			);
 			path = LrcMaker;
+			sourceTree = "<group>";
+		};
+		76E0CFB11C11C80D00283BBA /* FrameWorks */ = {
+			isa = PBXGroup;
+			children = (
+				76E0CFAF1C11C80000283BBA /* QuartzCore.framework */,
+				76E0CFAD1C11C7F300283BBA /* AVFoundation.framework */,
+				76E0CFAB1C11C7EC00283BBA /* ScriptingBridge.framework */,
+			);
+			name = FrameWorks;
+			sourceTree = "<group>";
+		};
+		76E0CFB91C11CF8E00283BBA /* Header */ = {
+			isa = PBXGroup;
+			children = (
+				76E0CFB51C11CF7100283BBA /* iTunes.h */,
+				76E0CFB41C11CF7000283BBA /* LrcMaker-Bridging-Header.h */,
+			);
+			name = Header;
+			sourceTree = "<group>";
+		};
+		76E0CFBA1C11CFB800283BBA /* Other */ = {
+			isa = PBXGroup;
+			children = (
+				76399C4F1C112CF600B4B402 /* Macros.swift */,
+				76399C441C112C7500B4B402 /* Assets.xcassets */,
+				76399C491C112C7500B4B402 /* Info.plist */,
+			);
+			name = Other;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -128,7 +182,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				76E0CFC21C130E5200283BBA /* LyricsView.swift in Sources */,
+				76E0CFB81C11CF7100283BBA /* iTunesBridge.m in Sources */,
+				76399C501C112CF600B4B402 /* Macros.swift in Sources */,
 				76399C431C112C7500B4B402 /* AppDelegate.swift in Sources */,
+				76E0CFC01C12DD2400283BBA /* LyricsLineModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -182,7 +240,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -220,7 +278,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};
@@ -230,11 +288,20 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/LrcMaker",
+				);
 				INFOPLIST_FILE = LrcMaker/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_SWIFT_FLAGS = "-D DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = Eru.LrcMaker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "LrcMaker/LrcMaker-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -242,11 +309,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/LrcMaker",
+				);
 				INFOPLIST_FILE = LrcMaker/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = Eru.LrcMaker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "LrcMaker/LrcMaker-Bridging-Header.h";
 			};
 			name = Release;
 		};
@@ -269,6 +343,7 @@
 				76399C4E1C112C7500B4B402 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
