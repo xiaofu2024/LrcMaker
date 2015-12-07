@@ -32,6 +32,8 @@
 		7634AB0C1C1520CD0051E5B4 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		7634AB171C15438E0051E5B4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainWindow.xib; sourceTree = "<group>"; };
 		7634AB191C1545C80051E5B4 /* MainWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainWindowController.swift; sourceTree = "<group>"; };
+		7634AB1E1C1563220051E5B4 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/MainWindow.strings"; sourceTree = "<group>"; };
+		7634AB201C1564020051E5B4 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainWindow.strings"; sourceTree = "<group>"; };
 		76399C3F1C112C7500B4B402 /* LrcMaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LrcMaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		76399C421C112C7500B4B402 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		76399C441C112C7500B4B402 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -239,6 +241,8 @@
 			isa = PBXVariantGroup;
 			children = (
 				7634AB171C15438E0051E5B4 /* Base */,
+				7634AB1E1C1563220051E5B4 /* zh-Hant */,
+				7634AB201C1564020051E5B4 /* zh-Hans */,
 			);
 			name = MainWindow.xib;
 			sourceTree = "<group>";

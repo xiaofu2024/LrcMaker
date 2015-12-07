@@ -11,3 +11,4 @@
 "NO_SONG"="No Song Set";
 "NO_TITLE"="Title Not Set";
 "NO_LYRICS"="No Lyrics";
+"DUPLICATE_IN_T_PT"="A Time Point Can Only Set One Lyric";

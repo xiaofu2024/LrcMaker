@@ -11,3 +11,4 @@
 "NO_SONG"="請先選擇歌曲";
 "NO_TITLE"="請輸入歌曲名";
 "NO_LYRICS"="請輸入歌詞";
+"DUPLICATE_IN_T_PT"="同一時間點只允許一句歌詞";
