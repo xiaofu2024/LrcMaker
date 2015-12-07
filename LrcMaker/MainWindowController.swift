@@ -1,5 +1,5 @@
 //
-//  MainWindow.swift
+//  MainWindowController.swift
 //  LrcMaker
 //
 //  Created by Eru on 15/12/7.
@@ -17,9 +17,9 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
     
     // xml parser
     var persistentID: String!
-    var whetherGetPath: Bool = false
     var currentKey: String!
     var currentString: String!
+    var whetherGetPath: Bool = false
     
     // player
     var player: AVAudioPlayer!
@@ -29,27 +29,30 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
     @IBOutlet weak var playerSlider: NSSlider!
     @IBOutlet weak var positionLabel: NSTextField!
     
-    private var errorWin: ErrorWindow!
+    // lyrics Making
     private var lyricsArray: [String]!
     private var lrcLineArray: [LyricsLineModel]!
     private var lyricsView: LyricsView!
+    private var currentLine: Int = -1
+    
+    private var currentView: Int = 1
+    private var errorWin: ErrorWindow!
     @IBOutlet var textView: TextView!
     @IBOutlet weak var scrollView: NSScrollView!
     @IBOutlet weak var box: NSBox!
-    @IBOutlet weak var infoView: NSView!
-    @IBOutlet weak var lrcMakingView: NSView!
+    @IBOutlet weak var firstView: NSView!
+    @IBOutlet weak var secondView: NSView!
     @IBOutlet weak var songTitle: NSTextField!
     @IBOutlet weak var artist: NSTextField!
     @IBOutlet weak var album: NSTextField!
     @IBOutlet weak var maker: NSTextField!
     @IBOutlet weak var path: NSPathControl!
     
-    
     convenience init() {
         self.init(windowNibName:"MainWindow")
         self.window?.makeMainWindow()
         iTunes = iTunesBridge()
-        switchToView(infoView, animated: false)
+        switchToView(firstView, animated: false)
         lyricsArray = [String]()
         lrcLineArray = [LyricsLineModel]()
         errorWin = ErrorWindow()
@@ -88,7 +91,13 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
         box.frame.origin.y = y
     }
     
-    @IBAction func switchToLyricsMakingView(sender: AnyObject) {
+    @IBAction func switchToFirstView(sender: AnyObject) {
+        switchToView(firstView, animated: true)
+        currentView = 1
+        lrcLineArray.removeAll()
+    }
+    
+    @IBAction func switchSecondView(sender: AnyObject) {
         if player == nil {
             NSBeep()
             errorWin.fadeInAndOutWithErrorString(NSLocalizedString("NO_SONG", comment: ""))
@@ -101,22 +110,26 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
         }
         lyricsArray = textView.string!.componentsSeparatedByCharactersInSet(NSCharacterSet.newlineCharacterSet())
         var isEmpty: Bool = true
-        for str in lyricsArray {
-            if str.stringByReplacingOccurrencesOfString(" ", withString: "") != "" {
+        var i: Int = 0
+        while i < lyricsArray.count {
+            if lyricsArray[i].stringByReplacingOccurrencesOfString(" ", withString: "") == "" {
+                lyricsArray.removeAtIndex(i)
+                continue
+            } else {
                 isEmpty = false
             }
+            ++i
         }
         if isEmpty {
             errorWin.fadeInAndOutWithErrorString(NSLocalizedString("NO_LYRICS", comment: ""))
             return
         }
         lyricsView.setLyricsLayerWithArray(lyricsArray)
-        switchToView(lrcMakingView, animated: true)
-        self.window!.makeFirstResponder(lyricsView)
-    }
-    
-    @IBAction func switchToInfoView(sender: AnyObject) {
-        switchToView(infoView, animated: true)
+        switchToView(secondView, animated: true)
+        currentView = 2
+        currentLine = -1
+        player.currentTime = 0
+        play()
     }
     
     //MARK: - Player Controller
@@ -282,6 +295,12 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
     }
     
     @IBAction func shareLrc(sender: AnyObject) {
+        let lrcContent: NSMutableString = NSMutableString()
+        for lrcLine in lrcLineArray {
+            let str = NSString(format: "%@%@\n", lrcLine.timeTag,lrcLine.lyricsSentence)
+            lrcContent.appendString(str as String)
+        }
+        print(lrcContent)
     }
     
     //MARK: - XML Parser Delegate
@@ -315,16 +334,70 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
     // MARK: - Keyboard Events
     
     override func keyDown(theEvent: NSEvent) {
-        switch theEvent.keyCode {
-        case 123: //left arrow
-            Swift.print("Left")
-        case 125: //down arrow
-            Swift.print("Down")
-        case 126: //up arrow
-            Swift.print("Up")
-        default:
+        if currentView == 1 {
             super.keyDown(theEvent)
         }
+        else {
+            switch theEvent.keyCode {
+            case 123: //left arrow
+                leftKeyPressed()
+            case 125: //down arrow
+                downKeyPressed()
+            case 126: //up arrow
+                print("Up")
+                upKeyPressed()
+            default:
+                super.keyDown(theEvent)
+            }
+        }
+    }
+    
+    // Lyrics Making Methods
+    func downKeyPressed() {
+        let msecPosition: Int = Int(player.currentTime * 1000)
+        if lrcLineArray.count > 0 && lrcLineArray.last!.msecPosition == msecPosition {
+            errorWin.fadeInAndOutWithErrorString(NSLocalizedString("DUPLICATE_IN_T_PT", comment: ""))
+            return
+        }
+        if currentLine == lyricsArray.count - 1 {
+            //Done
+            return
+        }
+        NSLog("Add New Lrc Line")
+        currentLine++
+        let lrcLine: LyricsLineModel = LyricsLineModel()
+        lrcLine.lyricsSentence = lyricsArray[currentLine]
+        lrcLine.setTimeTagWithMsecPosition(msecPosition)
+        lrcLineArray.append(lrcLine)
+        lyricsView.setHighlightedLyricsLayerAtIndex(currentLine)
+        
+        let viewOrigin: NSPoint = lyricsView.frame.origin
+        if currentLine < 4 {
+            scrollView.contentView.scrollToPoint(NSMakePoint(viewOrigin.x, viewOrigin.y))
+        }
+        else if lyricsArray.count-currentLine < 5 {
+            scrollView.contentView.scrollToPoint(NSMakePoint(viewOrigin.x, viewOrigin.y+CGFloat(lyricsArray.count-7)*lyricsView.height))
+        }
+        else {
+            scrollView.contentView.scrollToPoint(NSMakePoint(viewOrigin.x, viewOrigin.y+CGFloat(currentLine-3)*lyricsView.height))
+        }
+    }
+    
+    func leftKeyPressed() {
+        if lrcLineArray.count == 0 || lrcLineArray.last?.lyricsSentence == "" {
+            return
+        }
+        NSLog("End Current Lyrics")
+        let msecPosition: Int = Int(player.currentTime * 1000)
+        let lrcLine: LyricsLineModel = LyricsLineModel()
+        lrcLine.lyricsSentence = ""
+        lrcLine.setTimeTagWithMsecPosition(msecPosition)
+        lrcLineArray.append(lrcLine)
+        lyricsView.changeHighlightedStyle()
+    }
+    
+    func upKeyPressed() {
+        
     }
 
 }

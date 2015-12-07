@@ -34,7 +34,7 @@ class ErrorWindow: NSWindow {
         
         self.contentView?.layer = CALayer()
         self.contentView?.wantsLayer = true
-        self.contentView?.layer?.backgroundColor = NSColor(calibratedWhite: 0, alpha: 0.5).CGColor
+        self.contentView?.layer?.backgroundColor = NSColor(calibratedWhite: 0, alpha: 0.65).CGColor
         self.contentView?.layer?.cornerRadius = 15
         
         errorText = CATextLayer()
