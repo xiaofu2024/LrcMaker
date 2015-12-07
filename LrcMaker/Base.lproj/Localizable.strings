@@ -1,0 +1,13 @@
+/* 
+  Localizable.strings
+  LrcMaker
+
+  Created by Eru on 15/12/7.
+  Copyright © 2015年 Eru. All rights reserved.
+*/
+"PLAY"="Play";
+"PAUSE"="Pause";
+
+"NO_SONG"="No Song Set";
+"NO_TITLE"="Title Not Set";
+"NO_LYRICS"="No Lyrics";

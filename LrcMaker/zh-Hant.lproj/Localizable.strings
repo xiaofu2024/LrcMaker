@@ -1,0 +1,13 @@
+/* 
+  Localizable.strings
+  LrcMaker
+
+  Created by Eru on 15/12/7.
+  Copyright © 2015年 Eru. All rights reserved.
+*/
+"PLAY"="播放";
+"PAUSE"="暫停";
+
+"NO_SONG"="請先選擇歌曲";
+"NO_TITLE"="請輸入歌曲名";
+"NO_LYRICS"="請輸入歌詞";
