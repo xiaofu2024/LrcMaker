@@ -27,6 +27,7 @@ class LyricsLineModel: NSObject {
     }
     
     func setTimeTagWithMsecPosition (theMsecPosition: Int) {
+        self.msecPosition = theMsecPosition
         let minute:Int = theMsecPosition/(60*1000)
         let second:Int = (theMsecPosition-minute*60*1000)/1000
         let mSecond:Int = theMsecPosition-(minute*60+second)*1000
@@ -47,9 +48,9 @@ class LyricsLineModel: NSObject {
         if mSecond > 99 {
             theTimeTag += "\(mSecond)]"
         } else if mSecond > 9 {
-            theTimeTag += "0\(second)]"
+            theTimeTag += "0\(mSecond)]"
         } else {
-            theTimeTag += "00\(second)]"
+            theTimeTag += "00\(mSecond)]"
         }
         self.timeTag = theTimeTag
     }
