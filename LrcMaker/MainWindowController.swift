@@ -271,9 +271,6 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
         positionLabel.stringValue = currentMinStr + ":" + currentSecStr + "/" + durationMinStr + ":" + durationSecStr
         
         if !player.playing {
-            if lyricsXButton.enabled {
-                
-            }
             pause()
         }
     }
