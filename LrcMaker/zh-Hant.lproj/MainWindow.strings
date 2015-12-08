@@ -2,9 +2,6 @@
 /* Class = "NSTextFieldCell"; title = "上一行"; ObjectID = "23t-of-ulB"; */
 "23t-of-ulB.title" = "上一行";
 
-/* Class = "NSButtonCell"; title = "預覽"; ObjectID = "33p-IQ-dTH"; */
-"33p-IQ-dTH.title" = "預覽";
-
 /* Class = "NSButton"; ibShadowedToolTip = "播放"; ObjectID = "6X1-t7-1Wg"; */
 "6X1-t7-1Wg.ibShadowedToolTip" = "播放";
 
@@ -17,6 +14,9 @@
 /* Class = "NSTextFieldCell"; title = "*"; ObjectID = "Dnh-X9-3Ea"; */
 "Dnh-X9-3Ea.title" = "*";
 
+/* Class = "NSButton"; ibShadowedToolTip = "同步到LyricsX"; ObjectID = "KyG-ee-bgz"; */
+"KyG-ee-bgz.ibShadowedToolTip" = "同步到LyricsX";
+
 /* Class = "NSButton"; ibShadowedToolTip = "使用iTunes當前歌曲"; ObjectID = "LBd-u5-ear"; */
 "LBd-u5-ear.ibShadowedToolTip" = "使用iTunes當前歌曲";
 
@@ -26,8 +26,8 @@
 /* Class = "NSWindow"; title = "LrcMaker"; ObjectID = "gay-G1-xKY"; */
 "gay-G1-xKY.title" = "LrcMaker";
 
-/* Class = "NSButtonCell"; title = "分享"; ObjectID = "gu8-RN-heU"; */
-"gu8-RN-heU.title" = "分享";
+/* Class = "NSButtonCell"; title = "儲存"; ObjectID = "gu8-RN-heU"; */
+"gu8-RN-heU.title" = "儲存";
 
 /* Class = "NSTextFieldCell"; title = "歌曲名:"; ObjectID = "h2W-EL-4Ig"; */
 "h2W-EL-4Ig.title" = "歌曲名:";

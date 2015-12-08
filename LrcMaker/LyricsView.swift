@@ -14,8 +14,8 @@ class LyricsView: NSView {
     var lyricsArray: [String]!
     var height: CGFloat!
     var attrs: [String:AnyObject]!
-    var inHighlightedAttrs: [String:AnyObject]!
-    var endHighlightedAttrs: [String:AnyObject]!
+    var highlightedCerulean: [String:AnyObject]!
+    var highlightedBlue: [String:AnyObject]!
     var currentHighLightedIndex: Int!
     var maxWidth: CGFloat!
     
@@ -34,15 +34,16 @@ class LyricsView: NSView {
     func didWhenInit() {
         self.layer = CALayer()
         self.wantsLayer = true
+        self.layer?.speed = 3
         
         attrs = [NSFontAttributeName : NSFont(name: "HiraginoSansGB-W3", size: 18)!]
         attrs[NSForegroundColorAttributeName] = NSColor.blackColor()
         
-        inHighlightedAttrs = [NSFontAttributeName : NSFont(name: "HiraginoSansGB-W6", size: 18)!]
-        inHighlightedAttrs[NSForegroundColorAttributeName] = NSColor.blueColor()
+        highlightedCerulean = [NSFontAttributeName : NSFont(name: "HiraginoSansGB-W6", size: 21.5)!]
+        highlightedCerulean[NSForegroundColorAttributeName] = NSColor(red: 2/255, green: 163/255, blue: 1, alpha: 1)
         
-        endHighlightedAttrs = [NSFontAttributeName : NSFont(name: "HiraginoSansGB-W6", size: 18)!]
-        endHighlightedAttrs[NSForegroundColorAttributeName] = NSColor(red: 2/255, green: 163/255, blue: 1, alpha: 1)
+        highlightedBlue = [NSFontAttributeName : NSFont(name: "HiraginoSansGB-W6", size: 21.5)!]
+        highlightedBlue[NSForegroundColorAttributeName] = NSColor.blueColor()
         
         lyricsLayers = [CATextLayer]()
         height = (self.frame.height - 10) / 7
@@ -92,14 +93,18 @@ class LyricsView: NSView {
         currentHighLightedIndex = -1
     }
     
-    func setHighlightedLyricsLayerAtIndex(index: Int) {
-        if currentHighLightedIndex != -1 {
-            let attributedStr = NSAttributedString(string: lyricsArray[currentHighLightedIndex], attributes: attrs)
-            lyricsLayers[currentHighLightedIndex].string = attributedStr
-        }
+    func setHighlightedAtIndex(index: Int, andStyle style: Int) {
+        unsetHighlighted()
         currentHighLightedIndex = index
-        let attributedStr = NSAttributedString(string: lyricsArray[index], attributes: inHighlightedAttrs)
+        let attributes: [String:AnyObject]
+        if style == 1 {
+            attributes = highlightedBlue
+        } else {
+            attributes = highlightedCerulean
+        }
+        let attributedStr = NSAttributedString(string: lyricsArray[index], attributes: attributes)
         let w = attributedStr.size().width
+        lyricsLayers[index].speed = 3
         if w > lyricsLayers[index].frame.width {
             lyricsLayers[index].frame = NSMakeRect(5, 10 + CGFloat(index) * height, w, height)
         }
@@ -110,10 +115,12 @@ class LyricsView: NSView {
         lyricsLayers[index].string = attributedStr
     }
     
-    func changeHighlightedStyle(){
+    func unsetHighlighted() {
         if currentHighLightedIndex != -1 {
-            let attributedStr = NSAttributedString(string: lyricsArray[currentHighLightedIndex], attributes: endHighlightedAttrs)
+            let attributedStr = NSAttributedString(string: lyricsArray[currentHighLightedIndex], attributes: attrs)
+            lyricsLayers[currentHighLightedIndex].speed = 1000
             lyricsLayers[currentHighLightedIndex].string = attributedStr
+            currentHighLightedIndex = -1
         }
     }
     

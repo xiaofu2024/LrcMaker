@@ -25,6 +25,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSXMLParserDelegate {
         // Insert code here to tear down your application
     }
     
+    func applicationShouldTerminateAfterLastWindowClosed(sender: NSApplication) -> Bool {
+        return true
+    }
     
 }
 

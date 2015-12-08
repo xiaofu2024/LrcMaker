@@ -12,7 +12,6 @@ import QuartzCore
 
 class MainWindowController: NSWindowController, NSXMLParserDelegate {
 
-    var timer: NSTimer!
     var iTunes: iTunesBridge!
     
     // xml parser
@@ -25,6 +24,7 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
     var player: AVAudioPlayer!
     var duration: Int = 0
     var currentPosition: Int = 0
+    var timeTagUpdateTimer: NSTimer!
     @IBOutlet weak var playPauseButton: NSButton!
     @IBOutlet weak var playerSlider: NSSlider!
     @IBOutlet weak var positionLabel: NSTextField!
@@ -47,13 +47,14 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
     @IBOutlet weak var album: NSTextField!
     @IBOutlet weak var maker: NSTextField!
     @IBOutlet weak var path: NSPathControl!
+    @IBOutlet weak var lyricsXButton: NSButton!
+    @IBOutlet weak var saveButton: NSButton!
     
     convenience init() {
         self.init(windowNibName:"MainWindow")
         self.window?.makeMainWindow()
         iTunes = iTunesBridge()
         switchToView(firstView, animated: false)
-        lyricsArray = [String]()
         lrcLineArray = [LyricsLineModel]()
         errorWin = ErrorWindow()
         
@@ -92,6 +93,23 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
     }
     
     @IBAction func switchToFirstView(sender: AnyObject) {
+        if currentView == 2 {
+            if lrcLineArray.count > 0 {
+                let alert: NSAlert = NSAlert()
+                alert.messageText = NSLocalizedString("NOT_SAVE", comment: "")
+                alert.informativeText = NSLocalizedString("CHECK_LEAVE", comment: "")
+                alert.addButtonWithTitle(NSLocalizedString("CANCEL", comment: ""))
+                alert.addButtonWithTitle(NSLocalizedString("LEAVE", comment: ""))
+                alert.beginSheetModalForWindow(self.window!, completionHandler: { (response) -> Void in
+                    if response == NSAlertSecondButtonReturn {
+                        self.switchToView(self.firstView, animated: true)
+                        self.currentView = 1
+                        self.lrcLineArray.removeAll()
+                    }
+                })
+                return
+            }
+        }
         switchToView(firstView, animated: true)
         currentView = 1
         lrcLineArray.removeAll()
@@ -125,9 +143,12 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
             return
         }
         lyricsView.setLyricsLayerWithArray(lyricsArray)
+        scrollView.contentView.scrollToPoint(lyricsView.frame.origin)
         switchToView(secondView, animated: true)
         currentView = 2
         currentLine = -1
+        lyricsXButton.enabled = false
+        saveButton.enabled = false
         player.currentTime = 0
         play()
     }
@@ -149,10 +170,10 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
         NSLog("Player is playing")
         iTunes.pause()
         player.play()
-        if timer == nil {
-            timer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: "updateTimeTag", userInfo: nil, repeats: true)
+        if timeTagUpdateTimer == nil {
+            timeTagUpdateTimer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: "updateTimeTag", userInfo: nil, repeats: true)
         } else {
-            timer.fireDate = NSDate()
+            timeTagUpdateTimer.fireDate = NSDate()
         }
         playPauseButton.image = NSImage(named: "pause_icon")
         playPauseButton .toolTip = NSLocalizedString("PAUSE", comment: "")
@@ -161,20 +182,56 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
     func pause() {
         NSLog("Player paused")
         player.pause()
-        if timer != nil {
-            timer.fireDate = NSDate.distantFuture()
+        if timeTagUpdateTimer != nil {
+            timeTagUpdateTimer.fireDate = NSDate.distantFuture()
         }
         playPauseButton.image = NSImage(named: "play_icon")
         playPauseButton .toolTip = NSLocalizedString("PLAY", comment: "")
     }
     
-    @IBAction func playAtTime(sender: AnyObject) {
-        player.currentTime = (sender as! NSSlider).doubleValue / 1000
+    @IBAction func jumpToTime(sender: AnyObject) {
+        let timePoint: Int = Int((sender as! NSSlider).doubleValue)
+        player.currentTime = Double(timePoint) / 1000
         updateTimeTag()
+        
+        // In the 2nd View
+        if currentView == 2 && lrcLineArray.count > 0 {
+            if timePoint < lrcLineArray.last?.msecPosition {
+                lyricsXButton.enabled = false
+                saveButton.enabled = false
+                var i: Int = 0
+                var lrcCount: Int = 0
+                while i < lrcLineArray.count {
+                    if lrcLineArray[i].msecPosition > timePoint {
+                        lrcLineArray.removeRange(i...lrcLineArray.count-1)
+                        break
+                    }
+                    else {
+                        if lrcLineArray[i].lyricsSentence != "" {
+                            lrcCount++
+                        }
+                    }
+                    i++
+                }
+                if lrcLineArray.count > 0 {
+                    currentLine = lrcCount - 1
+                    if lrcLineArray.last?.lyricsSentence == "" {
+                        lyricsView.setHighlightedAtIndex(currentLine, andStyle: 2)
+                    }
+                    else {
+                        lyricsView.setHighlightedAtIndex(currentLine, andStyle: 1)
+                    }
+                }
+                else {
+                    currentLine = -1
+                    lyricsView.unsetHighlighted()
+                }
+            }
+            scrollViewToFit()
+        }
     }
     
     func updateTimeTag() {
-        
         self.setValue(Int(player.currentTime * 1000), forKey: "currentPosition")
         
         let currentSec = currentPosition / 1000 % 60
@@ -214,11 +271,14 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
         positionLabel.stringValue = currentMinStr + ":" + currentSecStr + "/" + durationMinStr + ":" + durationSecStr
         
         if !player.playing {
+            if lyricsXButton.enabled {
+                
+            }
             pause()
         }
     }
     
-    //MARK: - Interface Methods
+    //MARK: - Music Source
     
     @IBAction func setSongFromiTunes(sender: AnyObject) {
         (sender as! NSButton).enabled = false
@@ -291,20 +351,169 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
         }
     }
     
-    @IBAction func preview(sender: AnyObject) {
+    //MARK: - Save lrc
+    
+    @IBAction func saveLrc(sender: AnyObject) {
+        let panel = NSSavePanel()
+        panel.allowedFileTypes = ["lrc"]
+        panel.nameFieldStringValue = songTitle.stringValue + " - " + artist.stringValue + ".lrc"
+        panel.extensionHidden = false
+        panel.beginSheetModalForWindow(self.window!) { (response) -> Void in
+            if response == NSFileHandlingPanelOKButton {
+                let lrcContent: NSString = self.generateLrc()
+                do {
+                    try lrcContent.writeToURL(panel.URL!, atomically: false, encoding: NSUTF8StringEncoding)
+                } catch let theError as NSError {
+                    NSLog("%@", theError.localizedDescription)
+                }
+            }
+        }
     }
     
-    @IBAction func shareLrc(sender: AnyObject) {
+    @IBAction func sendLrcToLyricsX(sender: AnyObject) {
+        let lrcContent: NSString = generateLrc()
+        let userInfo: [String:AnyObject] = ["SongTitle" : songTitle.stringValue,
+                                            "Artist" : artist.stringValue,
+                                            "Sender" : "LrcMaker",
+                                            "LyricsContents" : lrcContent]
+        NSDistributedNotificationCenter.defaultCenter().postNotificationName("ExtenalLyricsEvent", object: nil, userInfo: userInfo, deliverImmediately: true)
+    }
+    
+    func generateLrc() -> NSString {
         let lrcContent: NSMutableString = NSMutableString()
-        for lrcLine in lrcLineArray {
-            let str = NSString(format: "%@%@\n", lrcLine.timeTag,lrcLine.lyricsSentence)
+        if self.songTitle.stringValue.stringByReplacingOccurrencesOfString(" ", withString: "") != "" {
+            lrcContent.appendString("[ti:" + self.songTitle.stringValue + "]\n")
+        }
+        if self.artist.stringValue.stringByReplacingOccurrencesOfString(" ", withString: "") != "" {
+            lrcContent.appendString("[ar:" + self.artist.stringValue + "]\n")
+        }
+        if self.album.stringValue.stringByReplacingOccurrencesOfString(" ", withString: "") != "" {
+            lrcContent.appendString("[al:" + self.album.stringValue + "]\n")
+        }
+        if self.maker.stringValue.stringByReplacingOccurrencesOfString(" ", withString: "") != "" {
+            lrcContent.appendString("[by:" + self.maker.stringValue + "]\n")
+        }
+        lrcContent.appendString("[tool:LrcMaker]\n")
+        for lrcLine in self.lrcLineArray {
+            let str = NSString(format: "%@%@\n", lrcLine.timeTag!,lrcLine.lyricsSentence)
             lrcContent.appendString(str as String)
         }
-        print(lrcContent)
+        return lrcContent
     }
     
-    //MARK: - XML Parser Delegate
+    // MARK: - Keyboard Events
     
+    override func keyDown(theEvent: NSEvent) {
+        if currentView == 1 {
+            super.keyDown(theEvent)
+        }
+        else {
+            switch theEvent.keyCode {
+            case 123: //left arrow
+                endCurrentLine()
+            case 125: //down arrow
+                nextLine()
+            case 126: //up arrow
+                previousLine()
+            default:
+                super.keyDown(theEvent)
+            }
+        }
+    }
+    
+    // Lyrics Making Methods
+    func nextLine() {
+        let msecPosition: Int = Int(player.currentTime * 1000)
+        // Not allow two lyrics in the same time point
+        if lrcLineArray.count > 0 && lrcLineArray.last!.msecPosition == msecPosition {
+            errorWin.fadeInAndOutWithErrorString(NSLocalizedString("DUPLICATE_IN_T_PT", comment: ""))
+            NSBeep()
+            return
+        }
+        // Current line is last line
+        if currentLine == lyricsArray.count - 1 {
+            endCurrentLine()
+            lyricsXButton.enabled = true
+            saveButton.enabled = true
+            return
+        }
+        NSLog("Add New Lrc Line")
+        currentLine++
+        let lrcLine = LyricsLineModel()
+        lrcLine.lyricsSentence = lyricsArray[currentLine]
+        lrcLine.setTimeTagWithMsecPosition(msecPosition)
+        lrcLineArray.append(lrcLine)
+        lyricsView.setHighlightedAtIndex(currentLine, andStyle: 1)
+        
+        scrollViewToFit()
+    }
+    
+    func endCurrentLine() {
+        if lrcLineArray.count == 0 || lrcLineArray.last!.lyricsSentence == "" {
+            NSBeep()
+            return
+        }
+        NSLog("End Current Lyrics")
+        let msecPosition: Int = Int(player.currentTime * 1000)
+        let lrcLine: LyricsLineModel = LyricsLineModel()
+        lrcLine.lyricsSentence = ""
+        lrcLine.setTimeTagWithMsecPosition(msecPosition)
+        lrcLineArray.append(lrcLine)
+        lyricsView.setHighlightedAtIndex(currentLine, andStyle: 2)
+    }
+    
+    func previousLine() {
+        if lrcLineArray.count == 0 {
+            NSBeep()
+            return
+        }
+        var timePoint: Int = (lrcLineArray.last?.msecPosition)! - 2000
+        if lrcLineArray.last?.lyricsSentence != "" {
+            currentLine--
+        }
+        
+        lrcLineArray.removeLast()
+        lyricsXButton.enabled = false
+        saveButton.enabled = false
+        
+        if timePoint < 0 {
+            timePoint = 0
+        }
+        if lrcLineArray.count > 0 {
+            let tp: Int = lrcLineArray.last!.msecPosition!
+            if tp > timePoint {
+                timePoint = tp
+            }
+            if lrcLineArray.last!.lyricsSentence == "" {
+                lyricsView.setHighlightedAtIndex(currentLine, andStyle: 2)
+            }
+            else {
+                lyricsView.setHighlightedAtIndex(currentLine, andStyle: 1)
+            }
+        }
+        else {
+            lyricsView.unsetHighlighted()
+        }
+        player.currentTime = Double(timePoint/1000)
+        player.play()
+        
+        scrollViewToFit()
+    }
+    
+    func scrollViewToFit() {
+        let viewOrigin: NSPoint = lyricsView.frame.origin
+        if currentLine < 4 {
+            scrollView.contentView.scrollToPoint(viewOrigin)
+        }
+        else if lyricsArray.count-currentLine < 5 {
+            scrollView.contentView.scrollToPoint(NSMakePoint(viewOrigin.x, viewOrigin.y+CGFloat(lyricsArray.count-7)*lyricsView.height))
+        }
+        else {
+            scrollView.contentView.scrollToPoint(NSMakePoint(viewOrigin.x, viewOrigin.y+CGFloat(currentLine-3)*lyricsView.height))
+        }
+    }
+
+    //MARK: - XML Parser Delegate
     func parser(parser: NSXMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         if elementName == "key" {
             let trimmed = currentString.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
@@ -330,74 +539,26 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
         }
         currentString = currentString + string
     }
-    
-    // MARK: - Keyboard Events
-    
-    override func keyDown(theEvent: NSEvent) {
-        if currentView == 1 {
-            super.keyDown(theEvent)
-        }
-        else {
-            switch theEvent.keyCode {
-            case 123: //left arrow
-                leftKeyPressed()
-            case 125: //down arrow
-                downKeyPressed()
-            case 126: //up arrow
-                print("Up")
-                upKeyPressed()
-            default:
-                super.keyDown(theEvent)
+
+    //MARK: - Window Delegate
+    func windowShouldClose(sender: AnyObject?) -> Bool {
+        if currentView == 2 {
+            if lrcLineArray.count > 0 {
+                let alert: NSAlert = NSAlert()
+                alert.messageText = NSLocalizedString("NOT_SAVE", comment: "")
+                alert.informativeText = NSLocalizedString("CHECK_QUITE", comment: "")
+                alert.addButtonWithTitle(NSLocalizedString("CANCEL", comment: ""))
+                alert.addButtonWithTitle(NSLocalizedString("QUIT", comment: ""))
+                alert.beginSheetModalForWindow(self.window!, completionHandler: { (response) -> Void in
+                    if response == NSAlertSecondButtonReturn {
+                        self.window?.orderOut(nil)
+                    }
+                })
+                return false
+            } else {
+                return true
             }
         }
+        return true
     }
-    
-    // Lyrics Making Methods
-    func downKeyPressed() {
-        let msecPosition: Int = Int(player.currentTime * 1000)
-        if lrcLineArray.count > 0 && lrcLineArray.last!.msecPosition == msecPosition {
-            errorWin.fadeInAndOutWithErrorString(NSLocalizedString("DUPLICATE_IN_T_PT", comment: ""))
-            return
-        }
-        if currentLine == lyricsArray.count - 1 {
-            //Done
-            return
-        }
-        NSLog("Add New Lrc Line")
-        currentLine++
-        let lrcLine: LyricsLineModel = LyricsLineModel()
-        lrcLine.lyricsSentence = lyricsArray[currentLine]
-        lrcLine.setTimeTagWithMsecPosition(msecPosition)
-        lrcLineArray.append(lrcLine)
-        lyricsView.setHighlightedLyricsLayerAtIndex(currentLine)
-        
-        let viewOrigin: NSPoint = lyricsView.frame.origin
-        if currentLine < 4 {
-            scrollView.contentView.scrollToPoint(NSMakePoint(viewOrigin.x, viewOrigin.y))
-        }
-        else if lyricsArray.count-currentLine < 5 {
-            scrollView.contentView.scrollToPoint(NSMakePoint(viewOrigin.x, viewOrigin.y+CGFloat(lyricsArray.count-7)*lyricsView.height))
-        }
-        else {
-            scrollView.contentView.scrollToPoint(NSMakePoint(viewOrigin.x, viewOrigin.y+CGFloat(currentLine-3)*lyricsView.height))
-        }
-    }
-    
-    func leftKeyPressed() {
-        if lrcLineArray.count == 0 || lrcLineArray.last?.lyricsSentence == "" {
-            return
-        }
-        NSLog("End Current Lyrics")
-        let msecPosition: Int = Int(player.currentTime * 1000)
-        let lrcLine: LyricsLineModel = LyricsLineModel()
-        lrcLine.lyricsSentence = ""
-        lrcLine.setTimeTagWithMsecPosition(msecPosition)
-        lrcLineArray.append(lrcLine)
-        lyricsView.changeHighlightedStyle()
-    }
-    
-    func upKeyPressed() {
-        
-    }
-
 }

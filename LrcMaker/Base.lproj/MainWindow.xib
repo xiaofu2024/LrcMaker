@@ -12,11 +12,13 @@
                 <outlet property="artist" destination="6Zz-ST-kM3" id="rMh-re-DIz"/>
                 <outlet property="box" destination="tj7-GL-Swg" id="iuR-Tb-Wcf"/>
                 <outlet property="firstView" destination="0Jj-Pu-KDk" id="mwm-9A-Hpb"/>
+                <outlet property="lyricsXButton" destination="KyG-ee-bgz" id="eqs-Wh-ZPc"/>
                 <outlet property="maker" destination="wHa-vS-1QO" id="Wyz-AH-UEB"/>
                 <outlet property="path" destination="Sup-lg-jfm" id="Pf5-xw-YpG"/>
                 <outlet property="playPauseButton" destination="6X1-t7-1Wg" id="QND-ZL-Z5B"/>
                 <outlet property="playerSlider" destination="Lje-R5-eln" id="qtO-x7-qse"/>
                 <outlet property="positionLabel" destination="9a1-Ig-jpb" id="tLk-St-DuB"/>
+                <outlet property="saveButton" destination="Jvc-Rc-pSX" id="JX8-jb-YI4"/>
                 <outlet property="scrollView" destination="Lzx-9E-vmt" id="r30-9B-QcM"/>
                 <outlet property="secondView" destination="ujA-Yn-qSC" id="ET8-SS-wvj"/>
                 <outlet property="songTitle" destination="k76-n5-lu4" id="x3o-dx-p9O"/>
@@ -84,7 +86,7 @@ IA
                                     <animations/>
                                     <sliderCell key="cell" refusesFirstResponder="YES" state="on" alignment="left" maxValue="100" tickMarkPosition="above" sliderType="linear" id="v5w-dJ-jaY"/>
                                     <connections>
-                                        <action selector="playAtTime:" target="-2" id="kWv-s4-QPC"/>
+                                        <action selector="jumpToTime:" target="-2" id="caP-ti-ADA"/>
                                         <binding destination="-2" name="value" keyPath="self.currentPosition" previousBinding="NDS-NM-Ijd" id="JAT-Qk-vgg">
                                             <dictionary key="options">
                                                 <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
@@ -320,39 +322,15 @@ IA
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <button verticalHuggingPriority="750" id="Jvc-Rc-pSX">
-                    <rect key="frame" x="577" y="11" width="75" height="32"/>
+                    <rect key="frame" x="580" y="11" width="70" height="32"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <animations/>
-                    <buttonCell key="cell" type="push" title="Share" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="gu8-RN-heU">
+                    <buttonCell key="cell" type="push" title="Save" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="gu8-RN-heU">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="shareLrc:" target="-2" id="bYL-JO-DUN"/>
-                    </connections>
-                </button>
-                <button verticalHuggingPriority="750" id="lKg-J0-wJT">
-                    <rect key="frame" x="487" y="11" width="88" height="32"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <animations/>
-                    <buttonCell key="cell" type="push" title="Preview" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="33p-IQ-dTH">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="preview:" target="-2" id="Jmr-Ab-rx9"/>
-                    </connections>
-                </button>
-                <button verticalHuggingPriority="750" id="nXj-IN-epz">
-                    <rect key="frame" x="394" y="11" width="93" height="32"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <animations/>
-                    <buttonCell key="cell" type="push" title="Previous" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="h9Y-WE-wnW">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="switchToFirstView:" target="-2" id="CR1-88-smP"/>
+                        <action selector="saveLrc:" target="-2" id="AL7-ER-arL"/>
                     </connections>
                 </button>
                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" id="8B4-0D-zhM">
@@ -446,6 +424,30 @@ IA
                         <animations/>
                     </scroller>
                 </scrollView>
+                <button verticalHuggingPriority="750" id="nXj-IN-epz">
+                    <rect key="frame" x="477" y="11" width="93" height="32"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <animations/>
+                    <buttonCell key="cell" type="push" title="Previous" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="h9Y-WE-wnW">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="switchToFirstView:" target="-2" id="CR1-88-smP"/>
+                    </connections>
+                </button>
+                <button toolTip="Send lrc to LyricsX" id="KyG-ee-bgz">
+                    <rect key="frame" x="20" y="12" width="32" height="32"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <animations/>
+                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="LyricsX" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="hNJ-3r-5Vw">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="sendLrcToLyricsX:" target="-2" id="wxW-3p-1gb"/>
+                    </connections>
+                </button>
             </subviews>
             <animations/>
             <point key="canvasLocation" x="1741" y="480.5"/>
@@ -453,6 +455,7 @@ IA
     </objects>
     <resources>
         <image name="Finder_icon" width="32" height="32"/>
+        <image name="LyricsX" width="32" height="32"/>
         <image name="arrow_down" width="32" height="32"/>
         <image name="arrow_left" width="32" height="32"/>
         <image name="arrow_up" width="32" height="32"/>
