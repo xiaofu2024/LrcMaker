@@ -34,6 +34,7 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
     private var lrcLineArray: [LyricsLineModel]!
     private var lyricsView: LyricsView!
     private var currentLine: Int = -1
+    private var isSaved: Bool = false
     
     private var currentView: Int = 1
     private var errorWin: ErrorWindow!
@@ -94,7 +95,7 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
     
     @IBAction func switchToFirstView(sender: AnyObject) {
         if currentView == 2 {
-            if lrcLineArray.count > 0 {
+            if lrcLineArray.count > 0 && !isSaved {
                 let alert: NSAlert = NSAlert()
                 alert.messageText = NSLocalizedString("NOT_SAVE", comment: "")
                 alert.informativeText = NSLocalizedString("CHECK_LEAVE", comment: "")
@@ -149,6 +150,7 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
         currentLine = -1
         lyricsXButton.enabled = false
         saveButton.enabled = false
+        isSaved = false
         player.currentTime = 0
         play()
     }
@@ -199,6 +201,8 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
             if timePoint < lrcLineArray.last?.msecPosition {
                 lyricsXButton.enabled = false
                 saveButton.enabled = false
+                isSaved = false
+                
                 var i: Int = 0
                 var lrcCount: Int = 0
                 while i < lrcLineArray.count {
@@ -362,7 +366,9 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
                     try lrcContent.writeToURL(panel.URL!, atomically: false, encoding: NSUTF8StringEncoding)
                 } catch let theError as NSError {
                     NSLog("%@", theError.localizedDescription)
+                    return
                 }
+                self.isSaved = true
             }
         }
     }
@@ -472,6 +478,7 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
         lrcLineArray.removeLast()
         lyricsXButton.enabled = false
         saveButton.enabled = false
+        isSaved = false
         
         if timePoint < 0 {
             timePoint = 0
@@ -540,7 +547,7 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
     //MARK: - Window Delegate
     func windowShouldClose(sender: AnyObject?) -> Bool {
         if currentView == 2 {
-            if lrcLineArray.count > 0 {
+            if lrcLineArray.count > 0 && !isSaved {
                 let alert: NSAlert = NSAlert()
                 alert.messageText = NSLocalizedString("NOT_SAVE", comment: "")
                 alert.informativeText = NSLocalizedString("CHECK_QUITE", comment: "")
