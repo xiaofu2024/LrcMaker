@@ -11,7 +11,7 @@ import AVFoundation
 import QuartzCore
 
 class MainWindowController: NSWindowController, NSXMLParserDelegate {
-
+    
     var iTunes: iTunesBridge!
     
     // xml parser
@@ -30,14 +30,14 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
     @IBOutlet weak var positionLabel: NSTextField!
     
     // lyrics Making
-    var lyricsArray: [String]!
-    var lrcLineArray: [LyricsLineModel]!
-    var lyricsView: LyricsView!
-    var currentLine: Int = -1
-    var isSaved: Bool = false
+    private var lyricsArray: [String]!
+    private var lrcLineArray: [LyricsLineModel]!
+    private var lyricsView: LyricsView!
+    private var currentLine: Int = -1
+    private var isSaved: Bool = false
     
-    var currentView: Int = 1
-    var errorWin: ErrorWindow!
+    private var currentView: Int = 1
+    private var errorWin: ErrorWindow!
     @IBOutlet var textView: TextView!
     @IBOutlet weak var scrollView: NSScrollView!
     @IBOutlet weak var box: NSBox!
@@ -321,7 +321,9 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
                         self.setValue(Int(self.player.duration * 1000), forKeyPath: "self.duration")
                         self.setValue(0, forKey: "currentPosition")
                         self.updateTimeTag()
-                        self.play()
+                        if NSUserDefaults.standardUserDefaults().boolForKey("LMPlayWhenAdded") {
+                            self.play()
+                        }
                         (sender as! NSButton).enabled = true
                     })
                 })
@@ -372,7 +374,9 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
                 self.setValue(0, forKey: "currentPosition")
                 self.player.prepareToPlay()
                 self.updateTimeTag()
-                self.play()
+                if NSUserDefaults.standardUserDefaults().boolForKey("LMPlayWhenAdded") {
+                    self.play()
+                }
             }
         }
     }
@@ -401,9 +405,9 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
     @IBAction func sendLrcToLyricsX(sender: AnyObject) {
         let lrcContent: NSString = generateLrc()
         let userInfo: [String:AnyObject] = ["SongTitle" : songTitle.stringValue,
-                                            "Artist" : artist.stringValue,
-                                            "Sender" : "LrcMaker",
-                                            "LyricsContents" : lrcContent]
+            "Artist" : artist.stringValue,
+            "Sender" : "LrcMaker",
+            "LyricsContents" : lrcContent]
         NSDistributedNotificationCenter.defaultCenter().postNotificationName("ExtenalLyricsEvent", object: nil, userInfo: userInfo, deliverImmediately: true)
     }
     
@@ -543,7 +547,7 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
             scrollView.contentView.scrollToPoint(NSMakePoint(viewOrigin.x, viewOrigin.y+CGFloat(currentLine-3)*lyricsView.height))
         }
     }
-
+    
     //MARK: - XML Parser Delegate
     func parser(parser: NSXMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         if elementName == "key" {
@@ -570,7 +574,7 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
         }
         currentString = currentString + string
     }
-
+    
     //MARK: - Window Delegate
     func windowShouldClose(sender: AnyObject?) -> Bool {
         if currentView == 2 {

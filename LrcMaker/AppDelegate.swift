@@ -30,27 +30,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSXMLParserDelegate {
         PreferencesController.sharedPreferences.showWindow(nil)
     }
     
-    func applicationShouldTerminate(sender: NSApplication) -> NSApplicationTerminateReply {
-        if mainWindow.currentView == 2 {
-            if mainWindow.lrcLineArray.count > 0 && !mainWindow.isSaved {
-                let alert: NSAlert = NSAlert()
-                alert.messageText = NSLocalizedString("NOT_SAVE", comment: "")
-                alert.informativeText = NSLocalizedString("CHECK_QUITE", comment: "")
-                alert.addButtonWithTitle(NSLocalizedString("CANCEL", comment: ""))
-                alert.addButtonWithTitle(NSLocalizedString("QUIT", comment: ""))
-                alert.beginSheetModalForWindow(mainWindow.window!, completionHandler: { (response) -> Void in
-                    if response == NSAlertSecondButtonReturn {
-                        NSApplication.sharedApplication().terminate(self)
-                    }
-                })
-                return .TerminateCancel
-            } else {
-                return .TerminateNow
-            }
-        }
-        return .TerminateNow
-    }
-    
     func applicationWillTerminate(aNotification: NSNotification) {
         // Insert code here to tear down your application
     }
