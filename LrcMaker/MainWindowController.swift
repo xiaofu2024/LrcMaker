@@ -30,14 +30,14 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
     @IBOutlet weak var positionLabel: NSTextField!
     
     // lyrics Making
-    private var lyricsArray: [String]!
-    private var lrcLineArray: [LyricsLineModel]!
-    private var lyricsView: LyricsView!
-    private var currentLine: Int = -1
-    private var isSaved: Bool = false
+    var lyricsArray: [String]!
+    var lrcLineArray: [LyricsLineModel]!
+    var lyricsView: LyricsView!
+    var currentLine: Int = -1
+    var isSaved: Bool = false
     
-    private var currentView: Int = 1
-    private var errorWin: ErrorWindow!
+    var currentView: Int = 1
+    var errorWin: ErrorWindow!
     @IBOutlet var textView: TextView!
     @IBOutlet weak var scrollView: NSScrollView!
     @IBOutlet weak var box: NSBox!

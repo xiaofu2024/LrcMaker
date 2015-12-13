@@ -14,13 +14,43 @@ import QuartzCore
 class AppDelegate: NSObject, NSApplicationDelegate, NSXMLParserDelegate {
     
     var mainWindow: MainWindowController!
-
+    
     func applicationDidFinishLaunching(aNotification: NSNotification) {
-        // Insert code here to initialize your application
         
+        let userDefaults: [String:AnyObject] = [
+            "LMHighLightedColor1" : NSKeyedArchiver.archivedDataWithRootObject(NSColor.blueColor()),
+            "LMHighLightedColor2" : NSKeyedArchiver.archivedDataWithRootObject(NSColor(red: 2/255, green: 163/255, blue: 1, alpha: 1)),
+            "LMPlayWhenAdded" : NSNumber(bool: true)
+        ]
+        NSUserDefaults.standardUserDefaults().registerDefaults(userDefaults)
         mainWindow = MainWindowController()
     }
-
+    
+    @IBAction func showPreferences(sender: AnyObject) {
+        PreferencesController.sharedPreferences.showWindow(nil)
+    }
+    
+    func applicationShouldTerminate(sender: NSApplication) -> NSApplicationTerminateReply {
+        if mainWindow.currentView == 2 {
+            if mainWindow.lrcLineArray.count > 0 && !mainWindow.isSaved {
+                let alert: NSAlert = NSAlert()
+                alert.messageText = NSLocalizedString("NOT_SAVE", comment: "")
+                alert.informativeText = NSLocalizedString("CHECK_QUITE", comment: "")
+                alert.addButtonWithTitle(NSLocalizedString("CANCEL", comment: ""))
+                alert.addButtonWithTitle(NSLocalizedString("QUIT", comment: ""))
+                alert.beginSheetModalForWindow(mainWindow.window!, completionHandler: { (response) -> Void in
+                    if response == NSAlertSecondButtonReturn {
+                        NSApplication.sharedApplication().terminate(self)
+                    }
+                })
+                return .TerminateCancel
+            } else {
+                return .TerminateNow
+            }
+        }
+        return .TerminateNow
+    }
+    
     func applicationWillTerminate(aNotification: NSNotification) {
         // Insert code here to tear down your application
     }
