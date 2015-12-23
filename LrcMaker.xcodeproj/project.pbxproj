@@ -9,8 +9,8 @@
 /* Begin PBXBuildFile section */
 		760432C01C1D4BBB0077E9B4 /* PreferencesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 760432BF1C1D4BBB0077E9B4 /* PreferencesController.swift */; };
 		760432C41C1D4CA20077E9B4 /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 760432C61C1D4CA20077E9B4 /* Preferences.xib */; };
+		7622A7651C2A6CF5001250DD /* ErrorWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7622A7641C2A6CF5001250DD /* ErrorWindowController.swift */; };
 		7634AAFF1C1324CF0051E5B4 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7634AAFE1C1324CF0051E5B4 /* TextView.swift */; };
-		7634AB051C148EC50051E5B4 /* ErrorWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7634AB041C148EC50051E5B4 /* ErrorWindow.swift */; };
 		7634AB081C151E380051E5B4 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7634AB061C151E380051E5B4 /* Localizable.strings */; };
 		7634AB181C15438E0051E5B4 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7634AB161C15438E0051E5B4 /* MainWindow.xib */; };
 		7634AB1A1C1545C80051E5B4 /* MainWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7634AB191C1545C80051E5B4 /* MainWindowController.swift */; };
@@ -31,8 +31,8 @@
 		760432C51C1D4CA20077E9B4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Preferences.xib; sourceTree = "<group>"; };
 		760432C81C1D4CA50077E9B4 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Preferences.strings"; sourceTree = "<group>"; };
 		760432CA1C1D4CA70077E9B4 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Preferences.strings"; sourceTree = "<group>"; };
+		7622A7641C2A6CF5001250DD /* ErrorWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorWindowController.swift; sourceTree = "<group>"; };
 		7634AAFE1C1324CF0051E5B4 /* TextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
-		7634AB041C148EC50051E5B4 /* ErrorWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorWindow.swift; sourceTree = "<group>"; };
 		7634AB071C151E380051E5B4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7634AB0A1C1520C70051E5B4 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		7634AB0C1C1520CD0051E5B4 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -89,7 +89,7 @@
 				76E0CFC11C130E5200283BBA /* LyricsView.swift */,
 				760432BF1C1D4BBB0077E9B4 /* PreferencesController.swift */,
 				7634AAFE1C1324CF0051E5B4 /* TextView.swift */,
-				7634AB041C148EC50051E5B4 /* ErrorWindow.swift */,
+				7622A7641C2A6CF5001250DD /* ErrorWindowController.swift */,
 			);
 			name = "Wins & Views";
 			sourceTree = "<group>";
@@ -232,13 +232,13 @@
 			files = (
 				7634AB1A1C1545C80051E5B4 /* MainWindowController.swift in Sources */,
 				76E0CFC21C130E5200283BBA /* LyricsView.swift in Sources */,
+				7622A7651C2A6CF5001250DD /* ErrorWindowController.swift in Sources */,
 				76E0CFB81C11CF7100283BBA /* iTunesBridge.m in Sources */,
 				760432C01C1D4BBB0077E9B4 /* PreferencesController.swift in Sources */,
 				76399C501C112CF600B4B402 /* Macros.swift in Sources */,
 				7634AAFF1C1324CF0051E5B4 /* TextView.swift in Sources */,
 				76399C431C112C7500B4B402 /* AppDelegate.swift in Sources */,
 				76E0CFC01C12DD2400283BBA /* LyricsLineModel.swift in Sources */,
-				7634AB051C148EC50051E5B4 /* ErrorWindow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
