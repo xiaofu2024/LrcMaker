@@ -16,7 +16,7 @@ class ErrorWindowController: NSWindowController {
     var attrs: [String:AnyObject]!
     var isOrderFront: Bool = false
     var timer: NSTimer!
-
+    
     convenience init() {
         NSLog("Init MessageWindow")
         let win = NSWindow(contentRect: NSZeroRect, styleMask: NSBorderlessWindowMask, backing: NSBackingStoreType.Buffered, `defer`: false)
@@ -80,5 +80,5 @@ class ErrorWindowController: NSWindowController {
         errorText.string = ""
         isOrderFront = false
     }
-
+    
 }
