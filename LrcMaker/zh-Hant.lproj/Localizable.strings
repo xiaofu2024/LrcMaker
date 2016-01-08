@@ -14,6 +14,9 @@
 "NO_TITLE"="請輸入歌曲名";
 "NO_LYRICS"="請輸入歌詞";
 "DUPLICATE_IN_T_PT"="同一時間點只允許一句歌詞";
+"ITUNES_LIBRARY_NOT_FOUND"="未找到iTunes資料庫";
+"FAILED_LOAD_ITUNES_SONG"="獲取iTunes資料庫資訊失敗";
+"FAILED_INIT_PLAYER"="播放器初始化失敗";
 
 // Alert
 "NOT_SAVE"="Lrc 未儲存";

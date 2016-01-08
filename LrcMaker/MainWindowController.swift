@@ -280,6 +280,8 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
     //MARK: - Music Source
     
     @IBAction func setSongFromiTunes(sender: AnyObject) {
+        let musicPath = NSSearchPathForDirectoriesInDomains(.MusicDirectory, [.UserDomainMask], true).first!
+        path.URL = NSURL(string: musicPath)
         (sender as! NSButton).enabled = false
         if iTunes.running() {
             songTitle.stringValue = iTunes.currentTitle()
@@ -293,7 +295,7 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
             }
             playPause(nil)
             let fm: NSFileManager = NSFileManager.defaultManager()
-            let iTunesLibrary: String = NSSearchPathForDirectoriesInDomains(.MusicDirectory, [.UserDomainMask], true).first! + "/iTunes/iTunes Music Library.xml"
+            let iTunesLibrary: String = NSSearchPathForDirectoriesInDomains(.MusicDirectory, [.UserDomainMask], true).first! + "/iTunes/iTunes Library.xml"
             if fm.fileExistsAtPath(iTunesLibrary) {
                 let data: NSData = NSData(contentsOfFile: iTunesLibrary)!
                 let parser: NSXMLParser = NSXMLParser(data: data)
@@ -303,6 +305,10 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), { () -> Void in
                     if parser.parse() == false {
                         NSLog("%@", parser.parserError!)
+                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                            ErrorWindowController.sharedErrorWindow.displayError(NSLocalizedString("FAILED_LOAD_ITUNES_SONG", comment: ""))
+                        })
+                        return
                     }
                     
                     do {
@@ -310,6 +316,9 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
                     } catch let theError as NSError {
                         NSLog("%@", theError.localizedDescription)
                         (sender as! NSButton).enabled = true
+                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                            ErrorWindowController.sharedErrorWindow.displayError(NSLocalizedString("FAILED_INIT_PLAYER", comment: ""))
+                        })
                         return
                     }
                     self.player.prepareToPlay()
@@ -326,10 +335,17 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
                     })
                 })
             }
+            else {
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    ErrorWindowController.sharedErrorWindow.displayError(NSLocalizedString("ITUNES_LIBRARY_NOT_FOUND", comment: ""))
+                })
+            }
         }
     }
     
     @IBAction func setSongInOpenPanel(sender: AnyObject) {
+        let musicPath = NSSearchPathForDirectoriesInDomains(.MusicDirectory, [.UserDomainMask], true).first!
+        path.URL = NSURL(string: musicPath)
         let openPanel = NSOpenPanel()
         openPanel.allowedFileTypes = ["mp3", "m4a", "wav", "aiff"]
         openPanel.extensionHidden = false

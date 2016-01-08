@@ -14,6 +14,9 @@
 "NO_TITLE"="Title Not Set";
 "NO_LYRICS"="No Lyrics";
 "DUPLICATE_IN_T_PT"="A Time Point Can Only Set One Lyric";
+"ITUNES_LIBRARY_NOT_FOUND"="iTunes Library Not Found";
+"FAILED_LOAD_ITUNES_SONG"="Failed To Load From iTunes Library";
+"FAILED_INIT_PLAYER"="Failed To Init Player";
 
 // Alert
 "NOT_SAVE"="Lrc hasn't been saved";
