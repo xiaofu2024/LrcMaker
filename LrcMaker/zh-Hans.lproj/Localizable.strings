@@ -14,9 +14,8 @@
 "NO_TITLE"="请输入歌曲名";
 "NO_LYRICS"="请输入歌词";
 "DUPLICATE_IN_T_PT"="同一时间点只允许一句歌词";
-"ITUNES_LIBRARY_NOT_FOUND"="未找到iTunes资料库";
-"FAILED_LOAD_ITUNES_SONG"="获取iTunes资料库信息失败";
 "FAILED_INIT_PLAYER"="播放器初始化失败";
+"LOCAL_MUSIC_ONLY"="仅支持本地音乐";
 
 // Alert
 "NOT_SAVE"="Lrc 未保存";

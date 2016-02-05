@@ -86,4 +86,10 @@
     }
 }
 
+-(void) playPause {
+    @autoreleasepool {
+        [iTunes playpause];
+    }
+}
+
 @end

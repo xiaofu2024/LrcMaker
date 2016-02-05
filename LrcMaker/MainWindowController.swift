@@ -10,16 +10,10 @@ import Cocoa
 import AVFoundation
 import QuartzCore
 
-class MainWindowController: NSWindowController, NSXMLParserDelegate {
+class MainWindowController: NSWindowController {
     
     var iTunes: iTunesBridge!
-    
-    // xml parser
-    var persistentID: String!
-    var currentKey: String!
-    var currentString: String!
-    var whetherGetPath: Bool = false
-    
+    var needsLoadingSong: Bool = false
     // player
     var player: AVAudioPlayer!
     var duration: Int = 0
@@ -61,7 +55,7 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
         scrollView.documentView = lyricsView
         let musicPath = NSSearchPathForDirectoriesInDomains(.MusicDirectory, [.UserDomainMask], true).first!
         path.URL = NSURL(string: musicPath)
-        
+        NSDistributedNotificationCenter.defaultCenter().addObserver(self, selector: "iTunesPlayerInfoChanged:", name: "com.apple.iTunes.playerInfo", object: nil)
         self.showWindow(nil)
     }
     
@@ -283,65 +277,14 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
         if !iTunes.running() {
             return
         }
-        let musicPath = NSSearchPathForDirectoriesInDomains(.MusicDirectory, [.UserDomainMask], true).first!
-        path.URL = NSURL(string: musicPath)
-        (sender as! NSButton).enabled = false
-        
-        songTitle.stringValue = iTunes.currentTitle()
-        artist.stringValue = iTunes.currentArtist()
-        album.stringValue = iTunes.currentAlbum()
-        
-        persistentID = iTunes.currentPersistentID()
-        if persistentID == "" {
-            (sender as! NSButton).enabled = true
-            return
-        }
-        playPause(nil)
-        let fm: NSFileManager = NSFileManager.defaultManager()
-        let iTunesLibrary: String = NSSearchPathForDirectoriesInDomains(.MusicDirectory, [.UserDomainMask], true).first! + "/iTunes/iTunes Library.xml"
-        if fm.fileExistsAtPath(iTunesLibrary) {
-            let data: NSData = NSData(contentsOfFile: iTunesLibrary)!
-            let parser: NSXMLParser = NSXMLParser(data: data)
-            parser.delegate = self
-            whetherGetPath = false
-            currentKey = ""
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), { () -> Void in
-                if parser.parse() == false {
-                    NSLog("%@", parser.parserError!)
-                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                        ErrorWindowController.sharedErrorWindow.displayError(NSLocalizedString("FAILED_LOAD_ITUNES_SONG", comment: ""))
-                    })
-                    return
-                }
-                
-                do {
-                    self.player = try AVAudioPlayer(contentsOfURL: self.path.URL!)
-                } catch let theError as NSError {
-                    NSLog("%@", theError.localizedDescription)
-                    (sender as! NSButton).enabled = true
-                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                        ErrorWindowController.sharedErrorWindow.displayError(NSLocalizedString("FAILED_INIT_PLAYER", comment: ""))
-                    })
-                    return
-                }
-                self.player.prepareToPlay()
-                NSLog("Song changed")
-                
-                dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                    self.setValue(Int(self.player.duration * 1000), forKeyPath: "self.duration")
-                    self.setValue(0, forKey: "currentPosition")
-                    self.updateTimeTag()
-                    if NSUserDefaults.standardUserDefaults().boolForKey("LMPlayWhenAdded") {
-                        self.play()
-                    }
-                    (sender as! NSButton).enabled = true
-                })
-            })
+        if iTunes.playing() {
+            needsLoadingSong = true
+            iTunes.pause()
         }
         else {
-            dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                ErrorWindowController.sharedErrorWindow.displayError(NSLocalizedString("ITUNES_LIBRARY_NOT_FOUND", comment: ""))
-            })
+            needsLoadingSong = true
+            iTunes.playPause()
+            iTunes.pause()
         }
     }
     
@@ -359,6 +302,7 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
                     self.player = try AVAudioPlayer(contentsOfURL: openPanel.URL!)
                 } catch let theError as NSError {
                     NSLog("%@", theError.localizedDescription)
+                    ErrorWindowController.sharedErrorWindow.displayError(NSLocalizedString("FAILED_INIT_PLAYER", comment: ""))
                     let musicPath = NSSearchPathForDirectoriesInDomains(.MusicDirectory, [.UserDomainMask], true).first!
                     self.path.URL = NSURL(string: musicPath)
                     return
@@ -576,31 +520,51 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
         }
     }
     
-    //MARK: - XML Parser Delegate
-    func parser(parser: NSXMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        if elementName == "key" {
-            let trimmed = currentString.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-            currentKey = trimmed
-        } else if currentString != nil {
-            let trimmed = currentString.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-            if currentKey == "Persistent ID" && trimmed == persistentID {
-                whetherGetPath = true
-            }
-            if whetherGetPath && currentKey == "Location" {
-                dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                    self.path.URL = NSURL(string: trimmed)
-                })
-                whetherGetPath = false
-            }
-        }
-        currentString = nil
-    }
+    //MARK: - Notifications
     
-    func parser(parser: NSXMLParser, foundCharacters string: String) {
-        if currentString == nil {
-            currentString = String()
+    func iTunesPlayerInfoChanged(n: NSNotification) {
+        let userInfo = n.userInfo
+        if needsLoadingSong {
+            needsLoadingSong = false
+            let currentTitle = userInfo!["Name"]
+            let currentArtist = userInfo!["Artist"]
+            let currentAlbum = userInfo!["Album"]
+            let fileLocation = userInfo!["Location"]
+            if currentTitle != nil {
+                songTitle.stringValue = currentTitle as! String
+            }
+            if currentArtist != nil {
+                artist.stringValue = currentArtist as! String
+            }
+            if currentAlbum != nil {
+                album.stringValue = currentAlbum as! String
+            }
+            if fileLocation != nil {
+                path.URL = NSURL(string: fileLocation as! String)
+                do {
+                    self.player = try AVAudioPlayer(contentsOfURL: path.URL!)
+                } catch let theError as NSError {
+                    NSLog("%@", theError.localizedDescription)
+                    ErrorWindowController.sharedErrorWindow.displayError(NSLocalizedString("FAILED_INIT_PLAYER", comment: ""))
+                    let musicPath = NSSearchPathForDirectoriesInDomains(.MusicDirectory, [.UserDomainMask], true).first!
+                    self.path.URL = NSURL(string: musicPath)
+                    return
+                }
+                NSLog("Song changed")
+                self.setValue(Int(self.player.duration * 1000), forKey: "duration")
+                self.setValue(0, forKey: "currentPosition")
+                self.player.prepareToPlay()
+                self.updateTimeTag()
+                if NSUserDefaults.standardUserDefaults().boolForKey("LMPlayWhenAdded") {
+                    self.play()
+                }
+            }
+            else {
+                let musicPath = NSSearchPathForDirectoriesInDomains(.MusicDirectory, [.UserDomainMask], true).first!
+                path.URL = NSURL(string: musicPath)
+                ErrorWindowController.sharedErrorWindow.displayError(NSLocalizedString("LOCAL_MUSIC_ONLY", comment: ""))
+            }
         }
-        currentString = currentString + string
     }
     
 }

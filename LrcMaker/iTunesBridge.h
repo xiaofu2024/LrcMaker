@@ -20,5 +20,6 @@
 -(NSString *) currentPersistentID;
 -(NSInteger) playerPosition;
 -(void) pause;
+-(void) playPause;
 
 @end
