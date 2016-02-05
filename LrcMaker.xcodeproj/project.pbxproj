@@ -18,6 +18,7 @@
 		76399C451C112C7500B4B402 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 76399C441C112C7500B4B402 /* Assets.xcassets */; };
 		76399C481C112C7500B4B402 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 76399C461C112C7500B4B402 /* MainMenu.xib */; };
 		76399C501C112CF600B4B402 /* Macros.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76399C4F1C112CF600B4B402 /* Macros.swift */; };
+		76A059801C5212740014B271 /* ClickView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76A0597F1C5212740014B271 /* ClickView.swift */; };
 		76E0CFAC1C11C7EC00283BBA /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76E0CFAB1C11C7EC00283BBA /* ScriptingBridge.framework */; };
 		76E0CFAE1C11C7F300283BBA /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76E0CFAD1C11C7F300283BBA /* AVFoundation.framework */; };
 		76E0CFB01C11C80000283BBA /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76E0CFAF1C11C80000283BBA /* QuartzCore.framework */; };
@@ -46,6 +47,7 @@
 		76399C4F1C112CF600B4B402 /* Macros.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Macros.swift; sourceTree = "<group>"; };
 		767E4A0F1C17092F00D48EFD /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainWindow.strings"; sourceTree = "<group>"; };
 		767E4A101C17093300D48EFD /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/MainWindow.strings"; sourceTree = "<group>"; };
+		76A0597F1C5212740014B271 /* ClickView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClickView.swift; sourceTree = "<group>"; };
 		76E0CFAB1C11C7EC00283BBA /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = System/Library/Frameworks/ScriptingBridge.framework; sourceTree = SDKROOT; };
 		76E0CFAD1C11C7F300283BBA /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		76E0CFAF1C11C80000283BBA /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -90,6 +92,7 @@
 				760432BF1C1D4BBB0077E9B4 /* PreferencesController.swift */,
 				7634AAFE1C1324CF0051E5B4 /* TextView.swift */,
 				7622A7641C2A6CF5001250DD /* ErrorWindowController.swift */,
+				76A0597F1C5212740014B271 /* ClickView.swift */,
 			);
 			name = "Wins & Views";
 			sourceTree = "<group>";
@@ -231,6 +234,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7634AB1A1C1545C80051E5B4 /* MainWindowController.swift in Sources */,
+				76A059801C5212740014B271 /* ClickView.swift in Sources */,
 				76E0CFC21C130E5200283BBA /* LyricsView.swift in Sources */,
 				7622A7651C2A6CF5001250DD /* ErrorWindowController.swift in Sources */,
 				76E0CFB81C11CF7100283BBA /* iTunesBridge.m in Sources */,

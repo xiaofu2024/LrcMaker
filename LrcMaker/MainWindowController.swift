@@ -280,72 +280,72 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
     //MARK: - Music Source
     
     @IBAction func setSongFromiTunes(sender: AnyObject) {
+        if !iTunes.running() {
+            return
+        }
         let musicPath = NSSearchPathForDirectoriesInDomains(.MusicDirectory, [.UserDomainMask], true).first!
         path.URL = NSURL(string: musicPath)
         (sender as! NSButton).enabled = false
-        if iTunes.running() {
-            songTitle.stringValue = iTunes.currentTitle()
-            artist.stringValue = iTunes.currentArtist()
-            album.stringValue = iTunes.currentAlbum()
-            
-            persistentID = (iTunes.currentPersistentID() as NSString).copy() as! String
-            if persistentID == "" {
-                (sender as! NSButton).enabled = true
-                return
-            }
-            playPause(nil)
-            let fm: NSFileManager = NSFileManager.defaultManager()
-            let iTunesLibrary: String = NSSearchPathForDirectoriesInDomains(.MusicDirectory, [.UserDomainMask], true).first! + "/iTunes/iTunes Library.xml"
-            if fm.fileExistsAtPath(iTunesLibrary) {
-                let data: NSData = NSData(contentsOfFile: iTunesLibrary)!
-                let parser: NSXMLParser = NSXMLParser(data: data)
-                parser.delegate = self
-                whetherGetPath = false
-                currentKey = ""
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), { () -> Void in
-                    if parser.parse() == false {
-                        NSLog("%@", parser.parserError!)
-                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                            ErrorWindowController.sharedErrorWindow.displayError(NSLocalizedString("FAILED_LOAD_ITUNES_SONG", comment: ""))
-                        })
-                        return
-                    }
-                    
-                    do {
-                        self.player = try AVAudioPlayer(contentsOfURL: self.path.URL!)
-                    } catch let theError as NSError {
-                        NSLog("%@", theError.localizedDescription)
-                        (sender as! NSButton).enabled = true
-                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                            ErrorWindowController.sharedErrorWindow.displayError(NSLocalizedString("FAILED_INIT_PLAYER", comment: ""))
-                        })
-                        return
-                    }
-                    self.player.prepareToPlay()
-                    NSLog("Song changed")
-                    
+        
+        songTitle.stringValue = iTunes.currentTitle()
+        artist.stringValue = iTunes.currentArtist()
+        album.stringValue = iTunes.currentAlbum()
+        
+        persistentID = iTunes.currentPersistentID()
+        if persistentID == "" {
+            (sender as! NSButton).enabled = true
+            return
+        }
+        playPause(nil)
+        let fm: NSFileManager = NSFileManager.defaultManager()
+        let iTunesLibrary: String = NSSearchPathForDirectoriesInDomains(.MusicDirectory, [.UserDomainMask], true).first! + "/iTunes/iTunes Library.xml"
+        if fm.fileExistsAtPath(iTunesLibrary) {
+            let data: NSData = NSData(contentsOfFile: iTunesLibrary)!
+            let parser: NSXMLParser = NSXMLParser(data: data)
+            parser.delegate = self
+            whetherGetPath = false
+            currentKey = ""
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), { () -> Void in
+                if parser.parse() == false {
+                    NSLog("%@", parser.parserError!)
                     dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                        self.setValue(Int(self.player.duration * 1000), forKeyPath: "self.duration")
-                        self.setValue(0, forKey: "currentPosition")
-                        self.updateTimeTag()
-                        if NSUserDefaults.standardUserDefaults().boolForKey("LMPlayWhenAdded") {
-                            self.play()
-                        }
-                        (sender as! NSButton).enabled = true
+                        ErrorWindowController.sharedErrorWindow.displayError(NSLocalizedString("FAILED_LOAD_ITUNES_SONG", comment: ""))
                     })
-                })
-            }
-            else {
+                    return
+                }
+                
+                do {
+                    self.player = try AVAudioPlayer(contentsOfURL: self.path.URL!)
+                } catch let theError as NSError {
+                    NSLog("%@", theError.localizedDescription)
+                    (sender as! NSButton).enabled = true
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        ErrorWindowController.sharedErrorWindow.displayError(NSLocalizedString("FAILED_INIT_PLAYER", comment: ""))
+                    })
+                    return
+                }
+                self.player.prepareToPlay()
+                NSLog("Song changed")
+                
                 dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                    ErrorWindowController.sharedErrorWindow.displayError(NSLocalizedString("ITUNES_LIBRARY_NOT_FOUND", comment: ""))
+                    self.setValue(Int(self.player.duration * 1000), forKeyPath: "self.duration")
+                    self.setValue(0, forKey: "currentPosition")
+                    self.updateTimeTag()
+                    if NSUserDefaults.standardUserDefaults().boolForKey("LMPlayWhenAdded") {
+                        self.play()
+                    }
+                    (sender as! NSButton).enabled = true
                 })
-            }
+            })
+        }
+        else {
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                ErrorWindowController.sharedErrorWindow.displayError(NSLocalizedString("ITUNES_LIBRARY_NOT_FOUND", comment: ""))
+            })
         }
     }
     
     @IBAction func setSongInOpenPanel(sender: AnyObject) {
-        let musicPath = NSSearchPathForDirectoriesInDomains(.MusicDirectory, [.UserDomainMask], true).first!
-        path.URL = NSURL(string: musicPath)
         let openPanel = NSOpenPanel()
         openPanel.allowedFileTypes = ["mp3", "m4a", "wav", "aiff"]
         openPanel.extensionHidden = false
@@ -359,6 +359,8 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
                     self.player = try AVAudioPlayer(contentsOfURL: openPanel.URL!)
                 } catch let theError as NSError {
                     NSLog("%@", theError.localizedDescription)
+                    let musicPath = NSSearchPathForDirectoriesInDomains(.MusicDirectory, [.UserDomainMask], true).first!
+                    self.path.URL = NSURL(string: musicPath)
                     return
                 }
                 NSLog("Song changed")
@@ -404,7 +406,7 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
         panel.extensionHidden = false
         panel.beginSheetModalForWindow(self.window!) { (response) -> Void in
             if response == NSFileHandlingPanelOKButton {
-                let lrcContent: NSString = self.generateLrc()
+                let lrcContents: String = self.generateLrc()
                 let fm = NSFileManager.defaultManager()
                 if fm.fileExistsAtPath(panel.URL!.path!) {
                     do {
@@ -415,7 +417,7 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
                     }
                 }
                 do {
-                    try lrcContent.writeToURL(panel.URL!, atomically: false, encoding: NSUTF8StringEncoding)
+                    try lrcContents.writeToURL(panel.URL!, atomically: false, encoding: NSUTF8StringEncoding)
                 } catch let theError as NSError {
                     NSLog("%@", theError.localizedDescription)
                     return
@@ -426,7 +428,7 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
     }
     
     @IBAction func sendLrcToLyricsX(sender: AnyObject) {
-        let lrcContent: NSString = generateLrc()
+        let lrcContent: String = generateLrc()
         let userInfo: [String:AnyObject] = ["SongTitle" : songTitle.stringValue,
             "Artist" : artist.stringValue,
             "Sender" : "LrcMaker",
@@ -434,26 +436,29 @@ class MainWindowController: NSWindowController, NSXMLParserDelegate {
         NSDistributedNotificationCenter.defaultCenter().postNotificationName("ExtenalLyricsEvent", object: nil, userInfo: userInfo, deliverImmediately: true)
     }
     
-    func generateLrc() -> NSString {
-        let lrcContent: NSMutableString = NSMutableString()
+    func generateLrc() -> String {
+        var lrcContents: String = String()
         if self.songTitle.stringValue.stringByReplacingOccurrencesOfString(" ", withString: "") != "" {
-            lrcContent.appendString("[ti:" + self.songTitle.stringValue + "]\n")
+            lrcContents.appendContentsOf("[ti:" + self.songTitle.stringValue + "]\n")
         }
         if self.artist.stringValue.stringByReplacingOccurrencesOfString(" ", withString: "") != "" {
-            lrcContent.appendString("[ar:" + self.artist.stringValue + "]\n")
+            lrcContents.appendContentsOf("[ar:" + self.artist.stringValue + "]\n")
         }
         if self.album.stringValue.stringByReplacingOccurrencesOfString(" ", withString: "") != "" {
-            lrcContent.appendString("[al:" + self.album.stringValue + "]\n")
+            lrcContents.appendContentsOf("[al:" + self.album.stringValue + "]\n")
         }
         if self.maker.stringValue.stringByReplacingOccurrencesOfString(" ", withString: "") != "" {
-            lrcContent.appendString("[by:" + self.maker.stringValue + "]\n")
+            lrcContents.appendContentsOf("[by:" + self.maker.stringValue + "]\n")
         }
-        lrcContent.appendString("[tool:LrcMaker]\n")
+        lrcContents.appendContentsOf("[tool:LrcMaker]\n")
         for lrcLine in self.lrcLineArray {
-            let str = NSString(format: "%@%@\n", lrcLine.timeTag!,lrcLine.lyricsSentence)
-            lrcContent.appendString(str as String)
+            let str = String(format: "%@%@\n", lrcLine.timeTag!,lrcLine.lyricsSentence)
+            lrcContents.appendContentsOf(str)
         }
-        return lrcContent
+        if lrcContents.characters.count > 0 {
+            lrcContents.removeAtIndex(lrcContents.endIndex.advancedBy(-1))
+        }
+        return lrcContents
     }
     
     // MARK: - Keyboard Events
