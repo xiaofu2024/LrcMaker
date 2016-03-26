@@ -55,7 +55,7 @@ class MainWindowController: NSWindowController {
         scrollView.documentView = lyricsView
         let musicPath = NSSearchPathForDirectoriesInDomains(.MusicDirectory, [.UserDomainMask], true).first!
         path.URL = NSURL(string: musicPath)
-        NSDistributedNotificationCenter.defaultCenter().addObserver(self, selector: "iTunesPlayerInfoChanged:", name: "com.apple.iTunes.playerInfo", object: nil)
+        NSDistributedNotificationCenter.defaultCenter().addObserver(self, selector: #selector(iTunesPlayerInfoChanged(_:)), name: "com.apple.iTunes.playerInfo", object: nil)
         self.showWindow(nil)
     }
     
@@ -129,7 +129,7 @@ class MainWindowController: NSWindowController {
             } else {
                 isEmpty = false
             }
-            ++i
+            i += 1
         }
         if isEmpty {
             ErrorWindowController.sharedErrorWindow.displayError(NSLocalizedString("NO_LYRICS", comment: ""))
@@ -165,7 +165,7 @@ class MainWindowController: NSWindowController {
         iTunes.pause()
         player.play()
         if timeTagUpdateTimer == nil {
-            timeTagUpdateTimer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: "updateTimeTag", userInfo: nil, repeats: true)
+            timeTagUpdateTimer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: #selector(updateTimeTag), userInfo: nil, repeats: true)
         } else {
             timeTagUpdateTimer.fireDate = NSDate()
         }
@@ -204,10 +204,10 @@ class MainWindowController: NSWindowController {
                     }
                     else {
                         if lrcLineArray[i].lyricsSentence != "" {
-                            lrcCount++
+                            lrcCount += 1
                         }
                     }
-                    i++
+                    i += 1
                 }
                 if lrcLineArray.count > 0 {
                     currentLine = lrcCount - 1
@@ -440,7 +440,7 @@ class MainWindowController: NSWindowController {
             return
         }
         NSLog("Add New Lrc Line")
-        currentLine++
+        currentLine += 1
         let lrcLine = LyricsLineModel()
         lrcLine.lyricsSentence = lyricsArray[currentLine]
         lrcLine.setTimeTagWithMsecPosition(msecPosition)
@@ -475,7 +475,7 @@ class MainWindowController: NSWindowController {
         }
         var timePoint: Int = (lrcLineArray.last?.msecPosition)! - 2000
         if lrcLineArray.last?.lyricsSentence != "" {
-            currentLine--
+            currentLine -= 1
         }
         
         lrcLineArray.removeLast()

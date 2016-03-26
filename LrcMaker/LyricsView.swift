@@ -38,7 +38,7 @@ class LyricsView: NSView {
         setAttributes()
         lyricsLayers = [CATextLayer]()
         height = (self.frame.height - 10) / 7
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "setAttributes", name: NSUserDefaultsDidChangeNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(setAttributes), name: NSUserDefaultsDidChangeNotification, object: nil)
     }
     
     func setAttributes() {
@@ -82,7 +82,7 @@ class LyricsView: NSView {
         lyricsLayers.removeAll()
         maxWidth = 0
         
-        for var i = 0; i < lyricsArray.count; ++i {
+        for i in 0 ..< lyricsArray.count {
             let lyrics: String = lyricsArray[i]
             let layer: CATextLayer = CATextLayer()
             self.layer?.addSublayer(layer)
